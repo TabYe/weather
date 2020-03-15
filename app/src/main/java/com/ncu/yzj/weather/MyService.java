@@ -76,7 +76,7 @@ public class MyService extends Service {
         return ret;
     }
     private void sendNotification(Weather weather){
-        NotificationManager manager = getSystemService(NotificationManager.class);
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (manager == null){
             Log.e("MyService", "NotificationManager is null");
             return;
@@ -87,23 +87,34 @@ public class MyService extends Service {
 
         String channelId = "1";
         String channelName = "天气通知";
-        NotificationManager manager = getSystemService(NotificationManager.class);
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (manager == null){
             Log.e("MyService", "NotificationManager is null");
             return null;
         }
-        NotificationChannel channel =
-                new NotificationChannel(
-                        channelId,
-                        channelName,
-                        NotificationManager.IMPORTANCE_HIGH );
-        manager.createNotificationChannel(channel);
+
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel;
+            channel = new NotificationChannel(
+                    channelId,
+                    channelName,
+                    NotificationManager.IMPORTANCE_HIGH );
+            manager.createNotificationChannel(channel);
+        }
+
         Intent intent = new Intent();
         intent.setClass(getApplicationContext(),MainActivity.class);
         PendingIntent pi = PendingIntent.getActivity(getApplication(),CODE,intent,0);
-        Notification.Builder nb = new Notification.Builder(getApplicationContext(),channelId)
-                //设置通知左侧的小图标
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+        Notification.Builder nb = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            nb = new Notification.Builder(getApplicationContext(),channelId);
+        }
+        else {
+            nb = new Notification.Builder(getApplicationContext());
+        }
+        //设置通知左侧的小图标
+        nb.setSmallIcon(R.drawable.ic_launcher_foreground)
                 //设置通知标题
                 .setContentTitle("天气提示")
                 //设置通知内容
@@ -147,7 +158,7 @@ public class MyService extends Service {
         return sb.toString();
     }
     private void initAlarm(){
-        AlarmManager alarmManager = getSystemService(AlarmManager.class);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent();
         intent.setClass(getApplicationContext(),MyService.class);
         PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(),CODE,intent,0);
