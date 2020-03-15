@@ -6,21 +6,53 @@ android {
 
     defaultConfig {
         applicationId "com.ncu.yzj.weather"
-        minSdkVersion 26
+        minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        debug {
+            try {
+                storeFile file("D:\\Android\\keys\\bsKey.jk")
+                storePassword STORE_PASSWORD
+                keyAlias KEY_ALIAS
+                keyPassword KEY_PASSWORD
+            } catch (ex) {
+                throw new InvalidUserDataException("You should define KEYSTORE_PASSWORD and KEY_PASSWORD in gradle.properties.")
+            }
+        }
+        release {
+
+            try {
+                storeFile file("D:\\Android\\keys\\bsKey.jk")
+                storePassword STORE_PASSWORD
+                keyAlias KEY_ALIAS
+                keyPassword KEY_PASSWORD
+            } catch (ex) {
+                throw new InvalidUserDataException("You should define KEYSTORE_PASSWORD and KEY_PASSWORD in gradle.properties.")
+            }
+        }
+    }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            zipAlignEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 
+    dataBinding{
+        enabled = true
+    }
+    compileOptions{
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -31,4 +63,10 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    //volley
+    implementation 'com.mcxiaoke.volley:library:1.0.19'
+
+    //gson
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
 }
